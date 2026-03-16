@@ -8,7 +8,6 @@
     Hopefully that works :)
 """
 
-
 def initialise():
     # Bring in a bunch of modules for the robot. As long as the pins are right, this should work...
     from motor import Motor
@@ -42,6 +41,7 @@ def initialise():
     
     # Initialise Oled Display
     oled_pin = I2C(0, sda=Pin(4), scl=Pin(5))
+    print(oled_pin.scan())
     oled = SSD1306_I2C(128, 64, oled_pin)
 
     # Wait for a moment for it all to turn on
@@ -50,6 +50,7 @@ def initialise():
 
     # Send back a list - copy-paste this into the top of the other doc
     return ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled
+
 
 """ Bootwait can be placed into code, and requires the bootsel button to be pressed before the code runs any further
     
@@ -62,6 +63,7 @@ def bootwait():
         if boot():
             break
 
+
 """ angle sets the angle of the servo motor, as a percentage of the duty cycle. You need to specify both the angle and
     the servo motor.
     Example: angle(90, servo)
@@ -69,6 +71,7 @@ def bootwait():
 def angle(angle, servo):
     position = int(8000 * ((angle + 7) / 180) + 1000)
     servo.duty_u16(position)
+
 
 """ calibrate uses the motors and encoders to proportionally adjust the pwm values (for a set list) and return a dictionary.
     This assumes that pwm is in a linear relationship to motor speed, which of course it isn't, but is fairly good.
@@ -119,3 +122,13 @@ def calibrate(left, right, enc, pwm=[30, 50, 80, 100], time=1):
 
     return values
 
+
+""" oled_text will set text to the position (x,y) on the screen, and show it. It also prints to the console.
+    Example: oled_text("Hello, World!", oled).
+"""
+def oled_text(text, oled, x=0, y=0):
+    from ssd1306 import SSD1306_I2C
+    oled.fill(0)
+    oled.text(text, x, y)
+    oled.show()
+    print(text)
