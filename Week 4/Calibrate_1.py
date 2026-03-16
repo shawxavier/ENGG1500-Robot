@@ -37,8 +37,4 @@ while True:
         motor_left.duty(80)   # Set the left motor to 80% pwm backwards
         motor_right.duty(80)  # Set the left motor to 80% pwm backwards
 
-    motor_left.duty(0)
-    motor_right.duty(0)
     sleep(1)
-
-print("hi!")
