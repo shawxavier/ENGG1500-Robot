@@ -40,3 +40,5 @@ while True:
     motor_left.duty(0)
     motor_right.duty(0)
     sleep(1)
+
+print("hi!")
