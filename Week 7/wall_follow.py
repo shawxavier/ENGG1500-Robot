@@ -1,6 +1,9 @@
 from initialise import *
 from time import sleep
 
+print("1")
+
+
 # Set variables from the initialise script
 ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = initialise()
 
