@@ -24,9 +24,9 @@ angle(90, servo)
 
 # ---------------- PARAMETERS ----------------
 BASE_SPEED = 30
-Kp = 0.025
-Kd = 0.01
-THRESHOLD = 3000
+Kp = 0.045
+Kd = 0.035
+THRESHOLD = 2800
 
 x_left = -15
 x_centre = 0
