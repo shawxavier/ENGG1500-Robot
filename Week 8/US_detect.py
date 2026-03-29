@@ -96,7 +96,7 @@ def turn_on_spot_slow():
 # Ultrasonic Environment Detector
 def US_detect():
 
-    dist_thresh = 80
+    dist_thresh = 220
     set_motors(0, 0)
     angle(90, servo)
     c = ultrasonic.distance_mm() < dist_thresh
@@ -148,6 +148,7 @@ while True:
 
             oled.fill(0)
             oled.text(environment, 0, 0)
+            oled.show()
             sleep(1)
 
             if environment == "NO LINE":
