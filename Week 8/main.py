@@ -7,24 +7,24 @@ ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = i
 angle(90, servo)
 
 # ---------------- CALIBRATION ----------------
-oled.fill(0)
-oled.text("Press to Calibrate", 0, 0)
-oled.show()
-bootwait()
-
-oled.fill(0)
-oled.text("Calibrating...", 0, 0)
-oled.show()
-pwm = calibrate(motor_left, motor_right, enc, pwm=[30, 40, 50], time=0.5)
-
-oled.fill(0)
-oled.text("Done!", 0, 0)
-oled.show()
-sleep(1)
+# oled.fill(0)
+# oled.text("Press to Calibrate", 0, 0)
+# oled.show()
+# bootwait()
+#
+# oled.fill(0)
+# oled.text("Calibrating...", 0, 0)
+# oled.show()
+# pwm = calibrate(motor_left, motor_right, enc, pwm=[30, 40, 50], time=0.5)
+#
+# oled.fill(0)
+# oled.text("Done!", 0, 0)
+# oled.show()
+# sleep(1)
 
 # ---------------- PARAMETERS ----------------
 BASE_SPEED = 40
-Kp = 0.018
+Kp = 0.025
 Kd = 0.009
 THRESHOLD = 3000
 
