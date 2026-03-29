@@ -84,14 +84,14 @@ def stop():
 def turn_on_spot_fast():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    motor_left.duty(25)   # fast enough to turn
-    motor_right.duty(25)
+    motor_left.duty(50)   # fast enough to turn
+    motor_right.duty(50)
 
 def turn_on_spot_slow():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    motor_left.duty(18)   # slow for precision alignment
-    motor_right.duty(18)
+    motor_left.duty(35)   # slow for precision alignment
+    motor_right.duty(35)
 
 # Ultrasonic Environment Detector
 def US_detect():
@@ -139,15 +139,15 @@ LED.on()
 while True:
 
     # ---------------- DEAD END DETECTION ----------------
-    if not turned_once and all_white():
-
+    # if not turned_once and all_white():
+    if all_white():
         if white_start is None:
             white_start = ticks_ms()
 
         elif ticks_diff(ticks_ms(), white_start) > WHITE_TIME:
 
             stop()
-            sleep(0.2)
+            sleep(0.5)
 
             environment = US_detect()
 
