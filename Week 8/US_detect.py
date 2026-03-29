@@ -23,7 +23,7 @@ oled.show()
 sleep(1)
 
 # ---------------- PARAMETERS ----------------
-BASE_SPEED = 25
+BASE_SPEED = 40
 Kp = 0.018
 Kd = 0.009
 THRESHOLD = 3000
