@@ -106,6 +106,7 @@ def US_detect():
     angle(180, servo)
     sleep(0.8)
     l = ultrasonic.distance_mm() < dist_thresh
+    angle(90, servo)
 
     if c and r and l:
         environment = "GARAGE"
@@ -146,7 +147,7 @@ while True:
             US_detect()
 
             oled.fill(0)
-            oled.text(enviromnent, 0, 0)
+            oled.text(environment, 0, 0)
             sleep(1)
 
             if environment == "NO LINE":
