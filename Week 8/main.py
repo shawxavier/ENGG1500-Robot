@@ -24,7 +24,7 @@ angle(90, servo)
 
 # ---------------- PARAMETERS ----------------
 BASE_SPEED = 40
-Kp = 0.035
+Kp = 0.045
 Kd = 0.009
 THRESHOLD = 3000
 
@@ -34,7 +34,7 @@ x_right = 15
 
 last_error = 0
 
-min_spd = 40
+max_spd = 50
 
 # ---------------- DEAD-END TIMER ----------------
 white_start = None
@@ -72,8 +72,8 @@ def any_black():
     )
 
 def set_motors(left, right):
-    left = max(0, min(min_spd, int(left)))
-    right = max(0, min(min_spd, int(right)))
+    left = max(0, min(max_spd, int(left)))
+    right = max(0, min(max_spd, int(right)))
     motor_left.set_forwards()
     motor_right.set_forwards()
     motor_left.duty(left)
