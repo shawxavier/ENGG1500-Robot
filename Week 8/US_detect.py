@@ -4,6 +4,8 @@ from time import sleep, ticks_ms, ticks_diff
 # ---------------- INITIALISE ----------------
 ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = initialise()
 
+angle(90, servo)
+
 # ---------------- CALIBRATION ----------------
 oled.fill(0)
 oled.text("Press to Calibrate", 0, 0)
@@ -38,7 +40,7 @@ WHITE_TIME = 150  # ms
 
 # ---------------- STATE FLAG ----------------
 turned_once = False
-environment = None
+environment = ""
 
 # ---------------- HELPER FUNCTIONS ----------------
 def read_line():
@@ -112,7 +114,7 @@ def US_detect():
     elif c:
         environment = "DEAD END"
     else:
-        enviromnent = "NO LINE"
+        environment = "NO LINE"
 
     return environment
 
@@ -168,7 +170,7 @@ while True:
 
                 turned_once = True
                 white_start = None
-                enviromnent = None
+                environment = ""
                 continue
 
     else:
