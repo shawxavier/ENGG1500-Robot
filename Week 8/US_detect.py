@@ -117,6 +117,11 @@ def US_detect():
     else:
         environment = "NO LINE"
 
+    oled.fill(0)
+    oled.text(environment, 0, 0)
+    oled.show()
+
+    sleep(1)
     return environment
 
 # ---------------- START ----------------
@@ -144,12 +149,7 @@ while True:
             stop()
             sleep(0.2)
 
-            US_detect()
-
-            oled.fill(0)
-            oled.text(environment, 0, 0)
-            oled.show()
-            sleep(1)
+            environment = US_detect()
 
             if environment == "NO LINE":
 
