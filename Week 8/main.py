@@ -24,7 +24,7 @@ angle(90, servo)
 
 # ---------------- PARAMETERS ----------------
 BASE_SPEED = 40
-Kp = 0.025
+Kp = 0.035
 Kd = 0.009
 THRESHOLD = 3000
 
@@ -34,7 +34,7 @@ x_right = 15
 
 last_error = 0
 
-min_spd = 50
+min_spd = 40
 
 # ---------------- DEAD-END TIMER ----------------
 white_start = None
