@@ -23,7 +23,7 @@ angle(90, servo)
 # sleep(1)
 
 # ---------------- PARAMETERS ----------------
-BASE_SPEED = 40
+BASE_SPEED = 30
 Kp = 0.045
 Kd = 0.009
 THRESHOLD = 3000
