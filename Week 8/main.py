@@ -34,6 +34,8 @@ x_right = 15
 
 last_error = 0
 
+min_spd = 50
+
 # ---------------- DEAD-END TIMER ----------------
 white_start = None
 WHITE_TIME = 150  # ms
@@ -70,8 +72,8 @@ def any_black():
     )
 
 def set_motors(left, right):
-    left = max(0, min(30, int(left)))
-    right = max(0, min(30, int(right)))
+    left = max(0, min(min_spd, int(left)))
+    right = max(0, min(min_spd, int(right)))
     motor_left.set_forwards()
     motor_right.set_forwards()
     motor_left.duty(left)
@@ -204,6 +206,7 @@ while True:
     oled.text(f"L:{ir_l.read_u16()}", 0, 10)
     oled.text(f"C:{ir_c.read_u16()}", 0, 20)
     oled.text(f"R:{ir_r.read_u16()}", 0, 30)
+    oled.text(f"Pos: {pos}", 0, 50)
     oled.show()
 
     sleep(0.02)
