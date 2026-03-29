@@ -99,10 +99,10 @@ def US_detect():
     angle(90, servo)
     c = ultrasonic.distance_mm() < dist_thresh
     angle(23, servo)
-    sleep(0.3)
+    sleep(0.8)
     r = ultrasonic.distance_mm() < dist_thresh
     angle(180, servo)
-    sleep(0.3)
+    sleep(0.8)
     l = ultrasonic.distance_mm() < dist_thresh
 
     if c and r and l:
@@ -143,6 +143,10 @@ while True:
 
             US_detect()
 
+            oled.fill(0)
+            oled.text(enviromnent, 0, 0)
+            sleep(1)
+
             if environment == "NO LINE":
 
                 oled.fill(0)
@@ -164,6 +168,7 @@ while True:
 
                 turned_once = True
                 white_start = None
+                enviromnent = None
                 continue
 
     else:
