@@ -4,8 +4,6 @@ from time import sleep, ticks_ms, ticks_diff
 # ---------------- INITIALISE ----------------
 ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = initialise()
 
-angle(90, servo)
-
 # ---------------- CALIBRATION ----------------
 oled.fill(0)
 oled.text("Press to Calibrate", 0, 0)
@@ -23,7 +21,7 @@ oled.show()
 sleep(1)
 
 # ---------------- PARAMETERS ----------------
-BASE_SPEED = 40
+BASE_SPEED = 25
 Kp = 0.018
 Kd = 0.009
 THRESHOLD = 3000
@@ -40,7 +38,6 @@ WHITE_TIME = 150  # ms
 
 # ---------------- STATE FLAG ----------------
 turned_once = False
-environment = ""
 
 # ---------------- HELPER FUNCTIONS ----------------
 def read_line():
@@ -93,37 +90,6 @@ def turn_on_spot_slow():
     motor_left.duty(18)   # slow for precision alignment
     motor_right.duty(18)
 
-# Ultrasonic Environment Detector
-def US_detect():
-
-    dist_thresh = 220
-    set_motors(0, 0)
-    angle(90, servo)
-    c = ultrasonic.distance_mm() < dist_thresh
-    angle(23, servo)
-    sleep(0.8)
-    r = ultrasonic.distance_mm() < dist_thresh
-    angle(180, servo)
-    sleep(0.8)
-    l = ultrasonic.distance_mm() < dist_thresh
-    angle(90, servo)
-
-    if c and r and l:
-        environment = "GARAGE"
-    elif r and l:
-        environment = "HALLWAY"
-    elif c:
-        environment = "DEAD END"
-    else:
-        environment = "NO LINE"
-
-    oled.fill(0)
-    oled.text(environment, 0, 0)
-    oled.show()
-
-    sleep(1)
-    return environment
-
 # ---------------- START ----------------
 oled.fill(0)
 oled.text("Press to Start", 0, 0)
@@ -149,31 +115,26 @@ while True:
             stop()
             sleep(0.2)
 
-            environment = US_detect()
+            oled.fill(0)
+            oled.text("TURNING", 0, 0)
+            oled.show()
 
-            if environment == "NO LINE":
+            # -------- FAST SPIN: find line --------
+            while not any_black():
+                turn_on_spot_fast()
+                sleep(0.01)
 
-                oled.fill(0)
-                oled.text("TURNING", 0, 0)
-                oled.show()
+            # -------- SLOW ALIGNMENT: centre sensor --------
+            while not centre_black():
+                turn_on_spot_slow()
+                sleep(0.01)
 
-                # -------- FAST SPIN: find line --------
-                while not any_black():
-                    turn_on_spot_fast()
-                    sleep(0.01)
+            stop()  # exactly on line
+            sleep(2)  # wait 2 seconds before resuming forward motion
 
-                # -------- SLOW ALIGNMENT: centre sensor --------
-                while not centre_black():
-                    turn_on_spot_slow()
-                    sleep(0.01)
-
-                stop()  # exactly on line
-                sleep(2)  # wait 2 seconds before resuming forward motion
-
-                turned_once = True
-                white_start = None
-                environment = ""
-                continue
+            turned_once = True
+            white_start = None
+            continue
 
     else:
         white_start = None
