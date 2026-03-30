@@ -86,12 +86,14 @@ def stop():
 def turn_on_spot_fast():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    set_motors(35,35)
+    motor_left.duty(30)
+    motor_right.duty(30)
 
 def turn_on_spot_slow():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    set_motors(20,20)
+    motor_left.duty(20)
+    motor_right.duty(20)
 
 # Ultrasonic Environment Detector
 def US_detect():
