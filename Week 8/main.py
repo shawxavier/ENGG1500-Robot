@@ -71,9 +71,6 @@ def any_black():
         ir_r.read_u16() > THRESHOLD
     )
 
-def fork():
-    return (ir_l.read_u16() > THRESHOLD and ir_r.read_u16() > THRESHOLD and ir_c < THRESHOLD)
-
 def set_motors(left, right):
     left = max(0, min(max_spd, int(left)))
     right = max(0, min(max_spd, int(right)))
@@ -102,10 +99,7 @@ def turn_on_spot_slow():
 def US_detect():
 
     dist_thresh = 220
-    set_motors(30, 30)
-    sleep(1)
     set_motors(0, 0)
-    sleep(0.5)
     angle(90, servo)
     c = ultrasonic.distance_mm() < dist_thresh
     angle(23, servo)
@@ -116,9 +110,7 @@ def US_detect():
     l = ultrasonic.distance_mm() < dist_thresh
     angle(90, servo)
 
-    if any_black():
-        environment = "NORMAL LINE"
-    elif c and r and l:
+    if c and r and l:
         environment = "GARAGE"
     elif r and l:
         environment = "HALLWAY"
@@ -126,12 +118,6 @@ def US_detect():
         environment = "DEAD END"
     else:
         environment = "NO LINE"
-        motor_left.set_backwards()
-        motor_right.set_backwards()
-        motor_left.duty(30)
-        motor_right.duty(30)
-        sleep(1)
-        stop()
 
     oled.fill(0)
     oled.text(environment, 0, 0)
