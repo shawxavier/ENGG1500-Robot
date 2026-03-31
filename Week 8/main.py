@@ -7,20 +7,20 @@ ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = i
 angle(90, servo)
 
 # ---------------- CALIBRATION ----------------
-oled.fill(0)
-oled.text("Press to Calibrate", 0, 0)
-oled.show()
-bootwait()
-
-oled.fill(0)
-oled.text("Calibrating...", 0, 0)
-oled.show()
-pwm = calibrate(motor_left, motor_right, enc, pwm=[30, 40], time=1)
-
-oled.fill(0)
-oled.text("Done!", 0, 0)
-oled.show()
-sleep(1)
+# oled.fill(0)
+# oled.text("Press to Calibrate", 0, 0)
+# oled.show()
+# bootwait()
+#
+# oled.fill(0)
+# oled.text("Calibrating...", 0, 0)
+# oled.show()
+# pwm = calibrate(motor_left, motor_right, enc, pwm=[30, 40, 50], time=0.5)
+#
+# oled.fill(0)
+# oled.text("Done!", 0, 0)
+# oled.show()
+# sleep(1)
 
 # ---------------- PARAMETERS ----------------
 BASE_SPEED = 30
@@ -102,8 +102,8 @@ def turn_on_spot_slow():
 def US_detect():
 
     dist_thresh = 220
-    set_motors(pwm["l_30"], pwm["r_30"])
-    sleep(0.5)
+    set_motors(30, 30)
+    sleep(1)
     set_motors(0, 0)
     sleep(0.5)
     angle(90, servo)
@@ -128,9 +128,9 @@ def US_detect():
         environment = "NO LINE"
         motor_left.set_backwards()
         motor_right.set_backwards()
-        motor_left.duty(pwm["l_30"])
-        motor_right.duty(pwm["r_30"])
-        sleep(0.5)
+        motor_left.duty(30)
+        motor_right.duty(30)
+        sleep(1)
         stop()
 
     oled.fill(0)
