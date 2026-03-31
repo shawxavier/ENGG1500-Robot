@@ -153,7 +153,7 @@ while True:
 
             environment = US_detect()
 
-    elif ultrasonic.distance_mm() < 80:
+    elif ultrasonic.distance_mm() < 120:
         environment = "DEAD END"
         white_start = None
 
