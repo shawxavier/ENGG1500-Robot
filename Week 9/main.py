@@ -92,8 +92,8 @@ def turn_on_spot_fast():
 def turn_on_spot_slow():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    motor_left.duty(18)
-    motor_right.duty(18)
+    motor_left.duty(23)
+    motor_right.duty(23)
 
 # Ultrasonic Environment Detector
 def US_detect():
