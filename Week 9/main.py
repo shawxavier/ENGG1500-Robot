@@ -99,7 +99,7 @@ def turn_on_spot_slow():
 def US_detect():
 
     dist_thresh = 220
-    set_motors(0, 0)
+    stop()
     angle(90, servo)
     c = ultrasonic.distance_mm() < dist_thresh
     angle(23, servo)
@@ -153,7 +153,7 @@ while True:
 
             environment = US_detect()
 
-    elif ultrasonic.distance_mm() < 150:
+    elif ultrasonic.distance_mm() < 80:
         environment = "DEAD END"
         white_start = None
 
