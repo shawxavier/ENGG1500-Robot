@@ -86,8 +86,8 @@ def stop():
 def turn_on_spot_fast():
     motor_left.set_forwards()
     motor_right.set_backwards()
-    motor_left.duty(20)
-    motor_right.duty(20)
+    motor_left.duty(25)
+    motor_right.duty(25)
 
 def turn_on_spot_slow():
     motor_left.set_forwards()
@@ -212,7 +212,7 @@ while True:
         continue
 
     elif environment == "HALLWAY":
-        # TODO
+        # TO DO
         continue
 
     # ---------------- NORMAL LINE FOLLOWING ----------------
