@@ -34,6 +34,7 @@ last_seen = 0   # -1 = left, 0 = centre, 1 = right
 white_start = None
 WHITE_TIME = 150
 environment = ""
+integral = None
 
 # Motor Function
 def set_motors(left, right):
