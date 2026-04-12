@@ -53,6 +53,9 @@ def enc_diff():
     return enc.get_left - enc.get_right
 
 def enc_pid(int):
+    L = ir_l.read_u16()
+    C = ir_c.read_u16()
+    R = ir_r.read_u16()
     while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
         L = ir_l.read_u16()
         C = ir_c.read_u16()
