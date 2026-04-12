@@ -61,18 +61,28 @@ def enc_pid(int):
         C = ir_c.read_u16()
         R = ir_r.read_u16()
         kp = 0.2
-        ki = 0.2
+        ki = 0.5
         kd = 0.02
+        base_speed = 30
         error = enc_diff()
         prev_error = error
         int += error * 0.1
         derv = (prev_error - error) / 0.1
         cont = error * kp + ki * int + kd * derv
-        set_motors(BASE_SPEED - cont * GAIN, BASE_SPEED + cont * GAIN)
-        sleep(0.1)
+        left = base_speed + cont * GAIN
+        right = base_speed + cont * GAIN
+        set_motors(left, right)
+        oled.fill(0)
+        oled.text("ENC PID", 0, 0)
+        oled.text(str(left), 0, 10)
+        oled.text(str(right), 0, 20)
+        oled.text(str(error), 0, 30)
+        oled.show()
+        sleep(0.02)
     return int
 
 # Start
+stop()
 oled.fill(0)
 oled.text("Press to Start", 0, 0)
 oled.show()
