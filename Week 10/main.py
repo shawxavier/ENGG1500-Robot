@@ -47,6 +47,29 @@ def set_motors(left, right):
 def stop():
     set_motors(0, 0)
 
+# Hallway Functions
+def enc_diff():
+    return enc.get_left - enc.get_right
+
+def enc_pid(int=None):
+    while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
+        L = ir_l.read_u16()
+        C = ir_c.read_u16()
+        R = ir_r.read_u16()
+        if int == None:
+            int = 0
+        kp = 0.2
+        ki = 0.2
+        kd = 0.02
+        error = enc_diff()
+        prev_error = error
+        int += error * 0.1
+        derv = (prev_error - error) / 0.1
+        cont = error * kp + ki * int + kd * derv
+        set_motors(BASE_SPEED - cont * GAIN, BASE_SPEED + cont * GAIN)
+        sleep(0.1)
+    return int
+
 # Start
 oled.fill(0)
 oled.text("Press to Start", 0, 0)
@@ -145,7 +168,10 @@ while True:
         environment = ""
         continue
 
-    elif environment == "HALLWAY":
+    # elif environment == "HALLWAY":
+    else:
+        enc.clear_count()
+        integral = enc_pid(integral)
         continue
 
     # Line Position (weighted average)
