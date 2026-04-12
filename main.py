@@ -184,18 +184,18 @@ while True:
             if diff > -10 and diff < 10:
                 motor_left.duty(pwm['l_30'])
                 motor_right.duty(pwm['r_30'])
-                sleep (0.5)
+                sleep (0.25)
             elif diff <= -10: #move over to the right
-                motor_left.duty(pwm['l_30'])
+                motor_left.duty(pwm['l_30']+10)
                 sleep(0.25)
                 motor_left.duty(0)
-                motor_right.duty(pwm['r_30'])
+                motor_right.duty(pwm['r_30']+10)
                 sleep(0.25)
             elif diff >= 10:
-                motor_right.duty(pwm['r_30'])
+                motor_right.duty(pwm['r_30']+10)
                 sleep(0.25)
                 motor_right.duty(0)
-                motor_left.duty(pwm['l_30'])
+                motor_left.duty(pwm['l_30']+10)
             sleep(0.25)
         angle(90, servo)
         environment = " "
