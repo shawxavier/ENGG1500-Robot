@@ -168,11 +168,11 @@ while True:
 
     elif environment == "HALLWAY":
     # else:
-        while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
+        while not (ir_l.read_u16() > THRESHOLD or ir_c.read_u16() > THRESHOLD or ir_r.read_u16() > THRESHOLD):
             stop()
-            L = ir_l.read_u16()
-            C = ir_c.read_u16()
-            R = ir_r.read_u16()
+            # L = ir_l.read_u16()
+            # C = ir_c.read_u16()
+            # R = ir_r.read_u16()
             motor_left.set_forwards()
             motor_right.set_forwards()
             angle(23, servo)
