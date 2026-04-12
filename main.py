@@ -34,7 +34,7 @@ last_seen = 0   # -1 = left, 0 = centre, 1 = right
 white_start = None
 WHITE_TIME = 150
 environment = ""
-integral = None
+integral = 0
 
 # Motor Function
 def set_motors(left, right):
@@ -52,13 +52,11 @@ def stop():
 def enc_diff():
     return enc.get_left - enc.get_right
 
-def enc_pid(int=None):
+def enc_pid(int):
     while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
         L = ir_l.read_u16()
         C = ir_c.read_u16()
         R = ir_r.read_u16()
-        if int == None:
-            int = 0
         kp = 0.2
         ki = 0.2
         kd = 0.02
