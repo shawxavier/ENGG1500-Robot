@@ -172,6 +172,9 @@ while True:
             angle(23, servo)
             sleep(0.3)
             diff = hallway_diff()
+            oled.fillRect(0, 10, 100, 10, 0)
+            oled.text(str(diff), 0, 10)
+            oled.show()
             if -10 < diff < -10:
                 motor_left.duty(pwm['l_30'])
                 motor_right.duty(pwm['r_30'])
