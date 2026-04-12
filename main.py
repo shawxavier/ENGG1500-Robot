@@ -1,26 +1,28 @@
 from initialise import *
 from time import sleep, ticks_ms, ticks_diff
 
-# Calibration
-# oled.fill(0)
-# oled.text("Press to Calibrate", 0, 0)
-# oled.show()
-# bootwait()
-#
-# oled.fill(0)
-# oled.text("Calibrating...", 0, 0)
-# oled.show()
-# pwm = calibrate(motor_left, motor_right, enc, pwm=[30, 40, 50], time=0.5)
-#
-# oled.fill(0)
-# oled.text("Done!", 0, 0)
-# oled.show()
-# sleep(1)
 
-# Parameters
+# Initialise Robot
 ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = initialise()
 angle(90, servo)
 
+# Calibration
+oled.fill(0)
+oled.text("Press to Calibrate", 0, 0)
+oled.show()
+bootwait()
+
+oled.fill(0)
+oled.text("Calibrating...", 0, 0)
+oled.show()
+pwm = calibrate(motor_left, motor_right, enc, pwm=[30], time=1)
+
+oled.fill(0)
+oled.text("Done!", 0, 0)
+oled.show()
+sleep(1)
+
+# Parameters
 BASE_SPEED = 18
 Kp = 0.06
 Kd = 0.02
@@ -49,37 +51,15 @@ def stop():
     set_motors(0, 0)
 
 # Hallway Functions
-def enc_diff():
-    return enc.get_left() - enc.get_right()
-
-def enc_pid(int):
-    L = ir_l.read_u16()
-    C = ir_c.read_u16()
-    R = ir_r.read_u16()
-    while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
-        L = ir_l.read_u16()
-        C = ir_c.read_u16()
-        R = ir_r.read_u16()
-        kp = 0.2
-        ki = 0.5
-        kd = 0.02
-        base_speed = 30
-        error = enc_diff()
-        prev_error = error
-        int += error * 0.1
-        derv = (prev_error - error) / 0.1
-        cont = error * kp + ki * int + kd * derv
-        left = base_speed + cont * GAIN
-        right = base_speed + cont * GAIN
-        set_motors(left, right)
-        oled.fill(0)
-        oled.text("ENC PID", 0, 0)
-        oled.text(str(left), 0, 10)
-        oled.text(str(right), 0, 20)
-        oled.text(str(error), 0, 30)
-        oled.show()
-        sleep(0.02)
-    return int
+def hallway_diff():
+    angle(23, servo)
+    sleep (0.3)
+    r = ultrasonic.distance_mm()
+    angle(180, servo)
+    sleep(0.6)
+    l = ultrasonic.distance_mm()
+    angle(90, servo)
+    return l - r
 
 # Start
 stop()
@@ -180,10 +160,29 @@ while True:
         environment = ""
         continue
 
-    # elif environment == "HALLWAY":
-    else:
-        enc.clear_count()
-        integral = enc_pid(integral)
+    elif environment == "HALLWAY":
+    # else:
+        while ir_l.read_u16() < THRESHOLD or ir_c.read_u16() < THRESHOLD or ir_r.read_u16() < THRESHOLD:
+            stop()
+            motor_left.set_forwards()
+            motor_right.set_backwards()
+            sleep(0.3)
+            diff = hallway_diff()
+            if -10 < diff < -10:
+                motor_left.duty(pwm['l_30'])
+                motor_right.duty(pwm['r_30'])
+                sleep (1)
+            elif diff < -10: #move over to the right
+                motor_left.duty(pwm['l_30'])
+                sleep(0.5)
+                motor_left.duty(0)
+                motor_right.duty(pwm['r_30'])
+                sleep(0.5)
+            elif diff > 10:
+                motor_right.duty(pwm['r_30'])
+                sleep(0.5)
+                motor_right.duty(0)
+                motor_left.duty(pwm['l_30'])
         continue
 
     # Line Position (weighted average)
