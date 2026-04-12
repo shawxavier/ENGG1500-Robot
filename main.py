@@ -168,7 +168,7 @@ while True:
 
     elif environment == "HALLWAY":
     # else:
-        while L < THRESHOLD or C < THRESHOLD or R < THRESHOLD:
+        while L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
             stop()
             L = ir_l.read_u16()
             C = ir_c.read_u16()
