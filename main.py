@@ -189,7 +189,7 @@ while True:
                 motor_left.duty(pwm['l_30'])
             sleep(0.25)
         angle(90, servo)
-    environment = " "
+        environment = " "
         continue
 
     # Line Position (weighted average)
