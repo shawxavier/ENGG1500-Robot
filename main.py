@@ -92,6 +92,9 @@ while True:
     if L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
         stop()
         sleep(0.3)
+        L = ir_l.read_u16()
+        C = ir_c.read_u16()
+        R = ir_r.read_u16()
         if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # Gap handling
             continue
         if white_start is None:
@@ -165,8 +168,11 @@ while True:
 
     elif environment == "HALLWAY":
     # else:
-        while ir_l.read_u16() < THRESHOLD or ir_c.read_u16() < THRESHOLD or ir_r.read_u16() < THRESHOLD:
+        while L < THRESHOLD or C < THRESHOLD or R < THRESHOLD:
             stop()
+            L = ir_l.read_u16()
+            C = ir_c.read_u16()
+            R = ir_r.read_u16()
             motor_left.set_forwards()
             motor_right.set_forwards()
             angle(23, servo)
