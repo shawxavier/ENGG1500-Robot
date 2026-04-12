@@ -50,7 +50,7 @@ def stop():
 
 # Hallway Functions
 def enc_diff():
-    return enc.get_left - enc.get_right
+    return enc.get_left() - enc.get_right()
 
 def enc_pid(int):
     L = ir_l.read_u16()
