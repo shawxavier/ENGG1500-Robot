@@ -52,13 +52,12 @@ def stop():
 
 # Hallway Functions
 def hallway_diff():
-    angle(23, servo)
     sleep (0.3)
     r = ultrasonic.distance_mm()
     angle(180, servo)
     sleep(0.6)
     l = ultrasonic.distance_mm()
-    angle(90, servo)
+    angle(23, servo)
     return l - r
 
 # Start
@@ -165,7 +164,8 @@ while True:
         while ir_l.read_u16() < THRESHOLD or ir_c.read_u16() < THRESHOLD or ir_r.read_u16() < THRESHOLD:
             stop()
             motor_left.set_forwards()
-            motor_right.set_backwards()
+            motor_right.set_forwards()
+            angle(23, servo)
             sleep(0.3)
             diff = hallway_diff()
             if -10 < diff < -10:
@@ -184,6 +184,7 @@ while True:
                 motor_right.duty(0)
                 motor_left.duty(pwm['l_30'])
             sleep(0.25)
+        angle(90, servo)
         continue
 
     # Line Position (weighted average)
