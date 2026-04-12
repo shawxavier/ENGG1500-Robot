@@ -90,11 +90,15 @@ while True:
 
     # Check for 'all white'
     if L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
+        stop()
+        sleep(0.3)
+        if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # Gap handling
+            continue
         if white_start is None:
             white_start = ticks_ms()
         elif ticks_diff(ticks_ms(), white_start) > WHITE_TIME:
-            stop()
-            sleep(0.3)
+            # stop()
+            # sleep(0.3)
 
             # Ultrasonic check
             angle(90, servo)
