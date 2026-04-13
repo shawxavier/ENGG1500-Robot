@@ -36,7 +36,6 @@ last_seen = 0   # -1 = left, 0 = centre, 1 = right
 white_start = None
 WHITE_TIME = 150
 environment = ""
-integral = 0
 
 # Motor Function
 def set_motors(left, right):
@@ -168,7 +167,7 @@ while True:
 
     elif environment == "HALLWAY":
     # else:
-        while not (ir_l.read_u16() > THRESHOLD or ir_c.read_u16() > THRESHOLD or ir_r.read_u16() > THRESHOLD):
+        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
             stop()
             # L = ir_l.read_u16()
             # C = ir_c.read_u16()
@@ -190,13 +189,14 @@ while True:
                 sleep(0.25)
                 motor_left.duty(0)
                 motor_right.duty(pwm['r_30']+5)
-                sleep(0.25)
+                sleep(0.15)
             elif diff >= 10:
                 motor_right.duty(pwm['r_30']+5)
                 sleep(0.25)
                 motor_right.duty(0)
                 motor_left.duty(pwm['l_30']+5)
-            sleep(0.25)
+                sleep(0.15)
+            sleep(0.15)
         angle(90, servo)
         environment = " "
         continue
