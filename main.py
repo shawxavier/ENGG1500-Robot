@@ -7,20 +7,20 @@ ir_l, ir_c, ir_r, motor_left, motor_right, ultrasonic, servo, enc, LED, oled = i
 angle(90, servo)
 
 # Calibration
-oled.fill(0)
-oled.text("Press to Calibrate", 0, 0)
-oled.show()
-bootwait()
-
-oled.fill(0)
-oled.text("Calibrating...", 0, 0)
-oled.show()
-pwm = calibrate(motor_left, motor_right, enc, pwm=[30], time=1)
-
-oled.fill(0)
-oled.text("Done!", 0, 0)
-oled.show()
-sleep(1)
+# oled.fill(0)
+# oled.text("Press to Calibrate", 0, 0)
+# oled.show()
+# bootwait()
+#
+# oled.fill(0)
+# oled.text("Calibrating...", 0, 0)
+# oled.show()
+# pwm = calibrate(motor_left, motor_right, enc, pwm=[30], time=1)
+#
+# oled.fill(0)
+# oled.text("Done!", 0, 0)
+# oled.show()
+# sleep(1)
 
 # Parameters
 BASE_SPEED = 18
@@ -180,21 +180,21 @@ while True:
             oled.fill_rect(0, 10, 100, 10, 0)
             oled.text(str(diff), 0, 10)
             oled.show()
-            if diff > -10 and diff < 10:
-                motor_left.duty(pwm['l_30'])
-                motor_right.duty(pwm['r_30'])
+            if diff > -25 and diff < 25:
+                motor_left.duty(30)
+                motor_right.duty(30)
                 sleep (0.25)
             elif diff <= -10: #move over to the right
-                motor_left.duty(pwm['l_30']+5)
-                sleep(0.25)
+                motor_left.duty(30+5)
+                sleep(0.35)
                 motor_left.duty(0)
-                motor_right.duty(pwm['r_30']+5)
+                motor_right.duty(30+0)
                 sleep(0.15)
             elif diff >= 10:
-                motor_right.duty(pwm['r_30']+5)
-                sleep(0.25)
+                motor_right.duty(30+0)
+                sleep(0.35)
                 motor_right.duty(0)
-                motor_left.duty(pwm['l_30']+5)
+                motor_left.duty(30+5)
                 sleep(0.15)
             sleep(0.15)
         angle(90, servo)
