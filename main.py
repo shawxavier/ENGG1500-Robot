@@ -24,7 +24,7 @@ angle(90, servo)
 
 # Parameters
 BASE_SPEED = 18
-Kp = 0.06
+Kp = 0.1
 Kd = 0.02
 GAIN = 220
 THRESHOLD = 2500
@@ -100,13 +100,13 @@ while True:
                     stop()
                     motor_left.set_forwards()
                     motor_right.set_forwards()
-                    motor_left.duty(30)
+                    motor_left.duty(35)
                     motor_right.duty(30)
                     sleep(0.5) # extra turn time before going straight
             elif ultrasonic.distance_mm() > 200: #same open threshold
                 motor_left.set_forwards()
                 motor_right.set_forwards()
-                motor_left.duty(30)
+                motor_left.duty(35)
                 motor_right.duty(30)
         environment = " "
         continue
@@ -155,7 +155,7 @@ while True:
             elif c:
                 environment = "DEAD END"
             else:
-                environment = "NO LINE"
+                environment = ""
 
             oled.fill(0)
             oled.text(environment, 0, 0)
@@ -176,8 +176,12 @@ while True:
             motor_left.duty(28)
             motor_right.duty(28)
             sleep(0.5)
+
         # Turn until line found
         while not (ir_l.read_u16() > THRESHOLD or ir_c.read_u16() > THRESHOLD or ir_r.read_u16() > THRESHOLD):
+            oled.fill(0)
+            oled.text("Fast Turning", 0, 0)
+            oled.show()
             motor_left.set_forwards()
             motor_right.set_backwards()
             motor_left.duty(28)
@@ -186,10 +190,13 @@ while True:
 
         # Align to centre
         while not ir_c.read_u16() > THRESHOLD:
+            oled.fill(0)
+            oled.text("Slow Turning", 0, 0)
+            oled.show()
             motor_left.set_forwards()
             motor_right.set_backwards()
-            motor_left.duty(20)
-            motor_right.duty(20)
+            motor_left.duty(30)
+            motor_right.duty(30)
             sleep(0.01)
 
         stop()
@@ -243,6 +250,7 @@ while True:
     wR = max(0, THRESHOLD - R)
 
     total = wL + wC + wR
+    print(total)
 
     if total < 80:
         pos = None
@@ -251,16 +259,28 @@ while True:
 
     # If it loses the line
     if pos is None: # 10 feels very slow... perhaps the whining?
+        oled.fill(0)
         if last_seen == -1:
-            set_motors(10, 22)   # turn left
+            oled.text("Turning Left", 0, 0)
+            set_motors(10, 28)   # turn left
+            sleep(0.3)
         elif last_seen == 1:
-            set_motors(20, 10)   # turn right (but a bit slower)
+            set_motors(28, 10)
+            oled.text("Turning Right", 0, 0)
+            sleep(0.3)
+            # turn right (but a bit slower)
         else:
-            set_motors(12, 12)
+            set_motors(28, 28)
+            oled.text("Continuing Straight", 0, 0)
+            sleep(2)
+        oled.show()
         sleep(0.02)
         continue
 
     # PD control
+    oled.fill(0)
+    oled.text("Line Follow", 0, 0)
+    oled.show()
     error = -pos
     derivative = error - last_error
     last_error = error
