@@ -247,10 +247,10 @@ while True:
     if total < 80:
         pos = None
     else:
-        pos = (wL*(-15) + wC*(0) + wR*(15)) / total
+        pos = (wL*(-15) + wC*(0) + wR*(15)) / total # we multiply by 0 here?
 
     # If it loses the line
-    if pos is None:
+    if pos is None: # 10 feels very slow... perhaps the whining?
         if last_seen == -1:
             set_motors(10, 22)   # turn left
         elif last_seen == 1:
