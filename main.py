@@ -35,7 +35,7 @@ last_seen = 0   # -1 = left, 0 = centre, 1 = right
 
 white_start = None
 WHITE_TIME = 150
-environment = ""
+environment = "START GARAGE"
 
 # Motor Function
 def set_motors(left, right):
@@ -79,6 +79,38 @@ while True:
     C = ir_c.read_u16()
     R = ir_r.read_u16()
 
+    if environment == "START GARAGE":
+        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
+            if ultrasonic.distance_mm() < 50: #backwards threshold
+                stop()
+                sleep(0.5)
+                motor_left.set_backwards()
+                motor_right.set_backwards()
+                motor_left.duty(20)
+                motor_right.duty(20)
+                sleep(0.7) # backwards time
+            elif ultrasonic.distance_mm() < 100: #turn threshold
+                motor_left.set_forwards()
+                motor_right.set_backwards()
+                motor_left.duty(20)
+                motor_right.duty(20)
+                sleep(0.3) #turn time
+                if ultrasonic.distance_mm() > 200: #open end of garage threshold (just a big number)
+                    sleep(0.5)
+                    stop()
+                    motor_left.set_forwards()
+                    motor_right.set_forwards()
+                    motor_left.duty(20)
+                    motor_right.duty(20)
+                    sleep(0.5) # extra turn time before going straight
+            elif ultrasonic.distance_mm() > 200: #same open threshold
+                motor_left.set_forwards()
+                motor_right.set_forwards()
+                motor_left.duty(20)
+                motor_right.duty(20)
+            environment = " "
+        continue
+
     # Track last seen
     if L > THRESHOLD:
         last_seen = -1
@@ -90,7 +122,7 @@ while True:
     # Check for 'all white'
     if L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
         stop()
-        sleep(0.3)
+        sleep(0.3) # time before checking - how long is a gap?
         L = ir_l.read_u16()
         C = ir_c.read_u16()
         R = ir_r.read_u16()
@@ -169,9 +201,6 @@ while True:
     # else:
         while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
             stop()
-            # L = ir_l.read_u16()
-            # C = ir_c.read_u16()
-            # R = ir_r.read_u16()
             motor_left.set_forwards()
             motor_right.set_forwards()
             angle(23, servo)
@@ -200,6 +229,13 @@ while True:
         angle(90, servo)
         environment = " "
         continue
+
+    elif environment == "GARAGE":
+        while ultrasonic.distance_mm() > 30:
+            set_motors(20,20)
+            sleep(0.3) #time before next check
+        stop()
+        break
 
     # Line Position (weighted average)
     wL = max(0, THRESHOLD - L)
@@ -241,3 +277,12 @@ while True:
 
     set_motors(left, right)
     sleep(0.02)
+
+LED.on()
+oled.fill(0)
+oled.text("YAYAYAYAYAYAYA", 0, 0)
+oled.text("YAYAYAYAYAYAYA", 0, 10)
+oled.text("YAYAYAYAYAYAYA", 0, 20)
+oled.text("YAYAYAYAYAYAYA", 0, 30)
+oled.text("YAYAYAYAYAYAYA", 0, 40)
+oled.show()
