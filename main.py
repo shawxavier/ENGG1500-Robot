@@ -108,7 +108,7 @@ while True:
                 motor_right.set_forwards()
                 motor_left.duty(30)
                 motor_right.duty(30)
-            environment = " "
+        environment = " "
         continue
 
     # Track last seen
