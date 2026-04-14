@@ -86,28 +86,28 @@ while True:
                 sleep(0.5)
                 motor_left.set_backwards()
                 motor_right.set_backwards()
-                motor_left.duty(20)
-                motor_right.duty(20)
+                motor_left.duty(30)
+                motor_right.duty(30)
                 sleep(0.7) # backwards time
             elif ultrasonic.distance_mm() < 100: #turn threshold
                 motor_left.set_forwards()
                 motor_right.set_backwards()
-                motor_left.duty(20)
-                motor_right.duty(20)
+                motor_left.duty(30)
+                motor_right.duty(30)
                 sleep(0.3) #turn time
                 if ultrasonic.distance_mm() > 200: #open end of garage threshold (just a big number)
                     sleep(0.5)
                     stop()
                     motor_left.set_forwards()
                     motor_right.set_forwards()
-                    motor_left.duty(20)
-                    motor_right.duty(20)
+                    motor_left.duty(30)
+                    motor_right.duty(30)
                     sleep(0.5) # extra turn time before going straight
             elif ultrasonic.distance_mm() > 200: #same open threshold
                 motor_left.set_forwards()
                 motor_right.set_forwards()
-                motor_left.duty(20)
-                motor_right.duty(20)
+                motor_left.duty(30)
+                motor_right.duty(30)
             environment = " "
         continue
 
@@ -232,7 +232,7 @@ while True:
 
     elif environment == "GARAGE":
         while ultrasonic.distance_mm() > 30:
-            set_motors(20,20)
+            set_motors(30,30)
             sleep(0.3) #time before next check
         stop()
         break
