@@ -23,12 +23,12 @@ angle(90, servo)
 # sleep(1)
 
 # Parameters
-BASE_SPEED = 18
-Kp = 0.1
-Kd = 0.02
-GAIN = 220
-THRESHOLD = 2500
-max_spd = 36
+BASE_SPEED = 27
+Kp = 0.7
+Kd = 0.1
+GAIN = 200
+THRESHOLD = 2300
+max_spd = 35
 
 last_error = 0
 last_seen = 0   # -1 = left, 0 = centre, 1 = right
@@ -52,11 +52,23 @@ def stop():
 # Hallway Functions
 def hallway_diff():
     sleep (0.3)
-    r = ultrasonic.distance_mm()
+    r1 = ultrasonic.distance_mm()
+    angle(60, servo)
+    sleep(0.3)
+    r2 = ultrasonic.distance_mm()
+    angle(90, servo)
+    sleep(0.3)
+    if 0 < ultrasonic.distance_mm() < 80:
+        return ""
+    angle(130, servo)
+    sleep(0.3)
+    l1 = ultrasonic.distance_mm()
     angle(180, servo)
-    sleep(0.6)
-    l = ultrasonic.distance_mm()
+    sleep(0.3)
+    l2 = ultrasonic.distance_mm()
     angle(23, servo)
+    r = min(r1, r2)
+    l = min(l1, l2)
     return l - r
 
 # Start
@@ -81,7 +93,7 @@ while True:
 
     if environment == "START GARAGE":
         while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
-            if ultrasonic.distance_mm() < 50: #backwards threshold
+            if 0 < ultrasonic.distance_mm() < 50: #backwards threshold
                 stop()
                 sleep(0.5)
                 motor_left.set_backwards()
@@ -89,13 +101,13 @@ while True:
                 motor_left.duty(30)
                 motor_right.duty(30)
                 sleep(0.7) # backwards time
-            elif ultrasonic.distance_mm() < 100: #turn threshold
+            elif 0 < ultrasonic.distance_mm() < 100: #turn threshold
                 motor_left.set_forwards()
                 motor_right.set_backwards()
                 motor_left.duty(30)
                 motor_right.duty(30)
                 sleep(0.3) #turn time
-                if ultrasonic.distance_mm() > 200: #open end of garage threshold (just a big number)
+                if 0 < ultrasonic.distance_mm() > 200: #open end of garage threshold (just a big number)
                     sleep(0.5)
                     stop()
                     motor_left.set_forwards()
@@ -103,7 +115,7 @@ while True:
                     motor_left.duty(35)
                     motor_right.duty(30)
                     sleep(0.5) # extra turn time before going straight
-            elif ultrasonic.distance_mm() > 200: #same open threshold
+            elif  ultrasonic.distance_mm() > 200: #same open threshold
                 motor_left.set_forwards()
                 motor_right.set_forwards()
                 motor_left.duty(35)
@@ -128,23 +140,21 @@ while True:
         R = ir_r.read_u16()
         if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # Gap handling
             continue
-        if white_start is None:
-            white_start = ticks_ms()
         elif ticks_diff(ticks_ms(), white_start) > WHITE_TIME:
-            # stop()
-            # sleep(0.3)
-
-            # Ultrasonic check
+            set_motors(28, 28)
+            sleep(0.2)
+            stop()
+        # Ultrasonic check
             angle(90, servo)
-            c = ultrasonic.distance_mm() < 220
+            c = 0 < ultrasonic.distance_mm() < 350
 
             angle(23, servo)
             sleep(0.6)
-            r = ultrasonic.distance_mm() < 220
+            r = 0 < ultrasonic.distance_mm() < 220
 
             angle(180, servo)
             sleep(0.6)
-            l = ultrasonic.distance_mm() < 220
+            l = 0 < ultrasonic.distance_mm() < 220
 
             angle(90, servo)
 
@@ -164,8 +174,11 @@ while True:
     else:
         white_start = None
 
-    if ultrasonic.distance_mm() < 120:
+    if 0 < ultrasonic.distance_mm() < 180:
         environment = "DEAD END"
+
+    if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD:
+        environment = "ROUNDABOUT"
 
     # This is for special cases
     if environment == "NO LINE" or environment == "DEAD END":
@@ -195,8 +208,8 @@ while True:
             oled.show()
             motor_left.set_forwards()
             motor_right.set_backwards()
-            motor_left.duty(30)
-            motor_right.duty(30)
+            motor_left.duty(23)
+            motor_right.duty(23)
             sleep(0.01)
 
         stop()
@@ -216,65 +229,125 @@ while True:
             oled.fill_rect(0, 10, 100, 10, 0)
             oled.text(str(diff), 0, 10)
             oled.show()
+            if diff == "":
+                break
             if diff > -25 and diff < 25:
                 motor_left.duty(30)
                 motor_right.duty(30)
-                sleep (0.25)
+                sleep (0.3)
+                stop()
             elif diff <= -10: #move over to the right
-                motor_left.duty(30+5)
-                sleep(0.35)
+                motor_left.duty(30)
+                sleep(0.25)
                 motor_left.duty(0)
-                motor_right.duty(30+0)
+                #motor_right.duty(30)
                 sleep(0.15)
             elif diff >= 10:
-                motor_right.duty(30+0)
-                sleep(0.35)
+                motor_right.duty(30)
+                sleep(0.25)
                 motor_right.duty(0)
-                motor_left.duty(30+5)
+                #motor_left.duty(30)
                 sleep(0.15)
             sleep(0.15)
         angle(90, servo)
         environment = " "
+        set_motors(30,30)
+        sleep(0.3)
         continue
 
     elif environment == "GARAGE":
-        while ultrasonic.distance_mm() > 30:
+        sleep(0.5)
+        garage_dist_avg = 1000
+        while garage_dist_avg > 80:
             set_motors(30,30)
-            sleep(0.3) #time before next check
-        stop()
+            sleep(0.2) #time before next check
+            garage_dist = []
+            stop()
+            for i in range(5): # Take N measurements and get the average - to help with issues I was having
+                print(ultrasonic.distance_mm())
+                garage_dist.append(ultrasonic.distance_mm())
+                sleep(0.3)
+            garage_dist_avg = sum(garage_dist) / len(garage_dist)
+            print(f"Garage Distance: {garage_dist_avg}")
         break
 
+    """Not well implemented roundabout code, though probably needs to be added back in and fixed up.
+       Biggest issue was that it fired at the wrong points and just did donuts"""
+    # elif environment == "ROUNDABOUT":
+    #     counter = 0
+    #     oled.fill(0)
+    #     oled.text("Roundabout", 0, 0)
+    #     oled.show()
+    #     while counter < 2:
+    #         if ir_l.read_u16() > THRESHOLD and ir_c.read_u16() >  THRESHOLD:
+    #             counter += 1
+    #         error = -pos
+    #         derivative = error - last_error
+    #         last_error = error
+    #
+    #         correction = (Kp * error) + (Kd * derivative)
+    #
+    #         left = BASE_SPEED - correction * GAIN
+    #         right = BASE_SPEED + correction * GAIN
+    #
+    #         # Slow down on curves
+    #         if abs(error) > 5:
+    #             left *= 0.65
+    #             right *= 0.65
+    #
+    #         set_motors(left, right)
+    #         sleep(0.02)
+    #     stop()
+    #     while ir_c.read_u16() < THRESHOLD:
+    #         oled.text("Turning Left", 0, 0)
+    #         set_motors(10, 35)  # turn left
+    #         sleep(0.02)
+    #     environment = ""
+    #     continue
+
     # Line Position (weighted average)
-    wL = max(0, THRESHOLD - L)
-    wC = max(0, THRESHOLD - C)
-    wR = max(0, THRESHOLD - R)
+    wL = max(0, -THRESHOLD + L)
+    wC = max(0, -THRESHOLD + C)
+    wR = max(0, -THRESHOLD + R)
 
     total = wL + wC + wR
     print(total)
 
-    if total < 80:
+    if total < 10:
         pos = None
     else:
         pos = (wL*(-15) + wC*(0) + wR*(15)) / total # we multiply by 0 here?
 
     # If it loses the line
-    if pos is None: # 10 feels very slow... perhaps the whining?
-        oled.fill(0)
-        if last_seen == -1:
-            oled.text("Turning Left", 0, 0)
-            set_motors(10, 28)   # turn left
-            sleep(0.3)
-        elif last_seen == 1:
-            set_motors(28, 10)
-            oled.text("Turning Right", 0, 0)
-            sleep(0.3)
-            # turn right (but a bit slower)
-        else:
-            set_motors(28, 28)
-            oled.text("Continuing Straight", 0, 0)
-            sleep(2)
-        oled.show()
-        sleep(0.02)
+    if pos is None:
+        while ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD:
+            oled.fill(0)
+            stop()
+            wall_dist = ultrasonic.distance_mm()
+            if wall_dist > 40 and not wall_dist < 0: # HAS POTENTIAL TO MAKE TURNING FUNCTIONS SLOW. REMOVE THIS if it doesn't work.
+                if last_seen == -1:
+                    oled.text("Turning Left", 0, 0)
+                    set_motors(10, 30)   # turn left
+                    sleep(0.1)
+                else: # last_seen == 1:
+                    set_motors(30, 0)
+                    oled.text("Turning Right", 0, 0)
+                    sleep(0.1)
+            else:
+                motor_left.set_backwards()
+                motor_right.set_backwards()
+                motor_left.duty(30)
+                motor_right.duty(30)
+                sleep(0.1)
+            # else:
+            #     motor_left.set_backwards()
+            #     motor_right.set_backwards()
+            #     motor_left.duty(28)
+            #     motor_right.duty(28)
+            #     oled.text("Continuing Straight", 0, 0)
+            #     sleep(0.02)
+                oled.show()
+                sleep(0.02)
         continue
 
     # PD control
@@ -287,8 +360,8 @@ while True:
 
     correction = (Kp * error) + (Kd * derivative)
 
-    left = BASE_SPEED + correction * GAIN
-    right = BASE_SPEED - correction * GAIN
+    left = BASE_SPEED - correction * GAIN
+    right = BASE_SPEED + correction * GAIN
 
     # Slow down on curves
     if abs(error) > 5:
