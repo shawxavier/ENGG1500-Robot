@@ -177,7 +177,7 @@ while True:
     if 0 < ultrasonic.distance_mm() < 180:
         environment = "DEAD END"
 
-    if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD:
+    if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # If they all see black, then we are at a roundabout
         environment = "ROUNDABOUT"
 
     # This is for special cases
