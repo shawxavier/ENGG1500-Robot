@@ -27,8 +27,9 @@ BASE_SPEED = 27
 Kp = 0.7
 Kd = 0.1
 GAIN = 200
-THRESHOLD = 2300
+THRESHOLD = 2200
 max_spd = 35
+CTHRESHOLD = 3000
 
 last_error = 0
 last_seen = 0   # -1 = left, 0 = centre, 1 = right
@@ -92,7 +93,7 @@ while True:
     R = ir_r.read_u16()
 
     if environment == "START GARAGE":
-        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
+        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < CTHRESHOLD and ir_r.read_u16() < THRESHOLD):
             if 0 < ultrasonic.distance_mm() < 50: #backwards threshold
                 stop()
                 sleep(0.5)
@@ -128,17 +129,17 @@ while True:
         last_seen = -1
     elif R > THRESHOLD:
         last_seen = 1
-    elif C > THRESHOLD:
+    elif C > CTHRESHOLD:
         last_seen = 0
 
     # Check for 'all white'
-    if L < THRESHOLD and C < THRESHOLD and R < THRESHOLD:
+    if L < THRESHOLD and C < CTHRESHOLD and R < THRESHOLD:
         stop()
         sleep(0.3) # time before checking - how long is a gap?
         L = ir_l.read_u16()
         C = ir_c.read_u16()
         R = ir_r.read_u16()
-        if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # Gap handling
+        if L > THRESHOLD and C > CTHRESHOLD and R > THRESHOLD: # Gap handling
             continue
         elif ticks_diff(ticks_ms(), white_start) > WHITE_TIME:
             set_motors(28, 28)
@@ -177,7 +178,7 @@ while True:
     if 0 < ultrasonic.distance_mm() < 180:
         environment = "DEAD END"
 
-    if L > THRESHOLD and C > THRESHOLD and R > THRESHOLD: # If they all see black, then we are at a roundabout
+    if L > THRESHOLD and C > CTHRESHOLD and R > THRESHOLD:
         environment = "ROUNDABOUT"
 
     # This is for special cases
@@ -191,7 +192,7 @@ while True:
             sleep(0.5)
 
         # Turn until line found
-        while not (ir_l.read_u16() > THRESHOLD or ir_c.read_u16() > THRESHOLD or ir_r.read_u16() > THRESHOLD):
+        while not (ir_l.read_u16() > THRESHOLD or ir_c.read_u16() > CTHRESHOLD or ir_r.read_u16() > THRESHOLD):
             oled.fill(0)
             oled.text("Fast Turning", 0, 0)
             oled.show()
@@ -202,7 +203,7 @@ while True:
             sleep(0.01)
 
         # Align to centre
-        while not ir_c.read_u16() > THRESHOLD:
+        while not ir_c.read_u16() > CTHRESHOLD:
             oled.fill(0)
             oled.text("Slow Turning", 0, 0)
             oled.show()
@@ -219,7 +220,7 @@ while True:
 
     elif environment == "HALLWAY":
     # else:
-        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD):
+        while (ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < CTHRESHOLD and ir_r.read_u16() < THRESHOLD):
             stop()
             motor_left.set_forwards()
             motor_right.set_forwards()
@@ -237,14 +238,14 @@ while True:
                 sleep (0.3)
                 stop()
             elif diff <= -10: #move over to the right
-                motor_left.duty(30)
-                sleep(0.25)
+                motor_left.duty(35)
+                sleep(0.3)
                 motor_left.duty(0)
                 #motor_right.duty(30)
                 sleep(0.15)
             elif diff >= 10:
-                motor_right.duty(30)
-                sleep(0.25)
+                motor_right.duty(35)
+                sleep(0.3)
                 motor_right.duty(0)
                 #motor_left.duty(30)
                 sleep(0.15)
@@ -305,9 +306,24 @@ while True:
     #     environment = ""
     #     continue
 
+    if ir_c.read_u16() > 40000:
+        motor_left.set_backwards()
+        motor_right.set_backwards()
+        motor_left.duty(35)
+        motor_right.duty(35)
+        sleep(0.5)
+        while ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < CTHRESHOLD and ir_r.read_u16() < THRESHOLD:
+            motor_left.set_backwards()
+            motor_right.set_backwards()
+            motor_left.duty(25)
+            motor_right.duty(35)
+            sleep(0.02)
+        stop()
+        continue
+
     # Line Position (weighted average)
     wL = max(0, -THRESHOLD + L)
-    wC = max(0, -THRESHOLD + C)
+    wC = max(0, -CTHRESHOLD + C)
     wR = max(0, -THRESHOLD + R)
 
     total = wL + wC + wR
@@ -320,17 +336,17 @@ while True:
 
     # If it loses the line
     if pos is None:
-        while ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < THRESHOLD and ir_r.read_u16() < THRESHOLD:
+        while ir_l.read_u16() < THRESHOLD and ir_c.read_u16() < CTHRESHOLD and ir_r.read_u16() < THRESHOLD:
             oled.fill(0)
-            stop()
+            # stop()
             wall_dist = ultrasonic.distance_mm()
             if wall_dist > 40 and not wall_dist < 0: # HAS POTENTIAL TO MAKE TURNING FUNCTIONS SLOW. REMOVE THIS if it doesn't work.
                 if last_seen == -1:
                     oled.text("Turning Left", 0, 0)
-                    set_motors(10, 30)   # turn left
+                    set_motors(10, 35)   # turn left
                     sleep(0.1)
                 else: # last_seen == 1:
-                    set_motors(30, 0)
+                    set_motors(35, 0)
                     oled.text("Turning Right", 0, 0)
                     sleep(0.1)
             else:
